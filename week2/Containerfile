@@ -1,0 +1,13 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+# bootc 호환 이미지임을 명시
+LABEL containers.bootc 1
+
+# 추가 메타데이터 (선택사항)
+LABEL version="1.0"
+LABEL description="Nayoung's first custom bootc OS"
+
+RUN mkdir -p /var/roothome
+
+RUN dnf install -y vim && dnf clean all
+RUN bootc container lint
