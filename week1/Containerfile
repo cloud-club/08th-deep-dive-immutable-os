@@ -1,0 +1,13 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+RUN mkdir -p /var/roothome
+
+RUN dnf install -y \
+    vim \
+    && dnf clean all
+
+RUN bootc container lint    
+
+LABEL containers.bootc 1
+LABEL version="1.0"
+LABEL description="Chunsoo bootc week1"
