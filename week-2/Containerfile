@@ -1,0 +1,16 @@
+ARG BASE="quay.io/fedora/fedora-bootc:42"
+
+FROM $BASE
+
+RUN mkdir -p /var/root/home
+
+RUN dnf insatll -y \
+@core \
+@development-tools \
+podman \
+lshw sysstat \
+&& dnf clean all \
+&& rm -rf /var/cache/libdnf5
+
+RUN systemctl enable podman
+RUN systemctl enable sshd
