@@ -65,3 +65,48 @@ quay.io/fedora/fedora-bootc:42
 ```bash
 > sh build-anaconda-iso-v2.sh
 ```
+
+- Build 결과
+```bash
+...
+
+Build complete!
+Results saved in .
+
+> ls -R output/
+output/:
+bootiso  manifest-anaconda-iso.json
+
+output/bootiso:
+install.iso
+
+# iso 파일 이름 변경
+> mv install.iso fedora-bootc-42-custom-20250927.iso
+```
+
+## 5. proxmoxVE로 업로드
+- proxmox VE iso 디렉터리 경로
+	- `/mnt/hdd01_1TB/template/iso`
+
+- `scp`로 전송
+```bash
+> scp fedora-bootc-42-custom-ssh-20250927.iso root@192.168.35.225:/mnt/hdd01_1TB/template/iso/
+```
+
+## 6. Custom OS VM 생성
+- 생성한 커스텀 OS iso 파일을 기반으로 VM을 생성
+
+
+## 7. SSH 키 기반 접속
+```bash
+> ssh -i .ssh/beengineer_rsa.key test@192.168.35.97
+The authenticity of host '192.168.35.97 (192.168.35.97)' can't be established.
+ED25519 key fingerprint is SHA256:KiOJJH0A0XhtyVFTToGQU+gsVufH+oiLsit8A5NCnK0.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.35.97' (ED25519) to the list of known hosts.
+Last login: Sat Sep 27 00:02:35 2025
+[systemd]
+Failed Units: 1
+  systemd-remount-fs.service
+```
