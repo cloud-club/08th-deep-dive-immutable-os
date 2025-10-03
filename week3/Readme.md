@@ -97,7 +97,7 @@ AWS EC2 부팅
 nayoung으로 접속
 
 ```bash
-ssh -i "../immutable-os-keypair.pem" **nayoung**@ec2-43-203-240-243.ap-northeast-2.compute.amazonaws.com
+ssh -i "../immutable-os-keypair.pem" nayoung@ec2-43-203-240-243.ap-northeast-2.compute.amazonaws.com
 ```
 
 ---
@@ -115,13 +115,12 @@ ssh -i "../immutable-os-keypair.pem" **nayoung**@ec2-43-203-240-243.ap-northeast
 
 ## 🌳 BootC 기반 OS에서 패키지 설치와 OS 패키지 설치가 무엇이 다를까?
 
-### 1. **패키지 설치** (일반 OS)
+### 1. 패키지 설치 (일반 OS)
 
 > 전통적인 방식
 > 
 
 ```bash
-*# 런타임에 패키지 설치*
 ssh into-server
 sudo dnf install nginx
 ```
@@ -130,13 +129,13 @@ sudo dnf install nginx
 - ❌ 서버마다 상태가 달라질 수 있음
 - ❌ "누가 언제 뭘 설치했지?" 추적 어려움
 
-### 2. **OS 패키지 설치** (BootC)
+### 2. OS 패키지 설치 (BootC)
 
 > 컨테이너 이미지 방식
 > 
 
 ```bash
-*# Containerfile에서 선언*
+# Containerfile에서 선언
 RUN dnf install nginx
 ```
 
@@ -174,14 +173,11 @@ RUN dnf install nginx
 [nayoung@ip-172-31-13-197 ~]$ sudo dnf install htop
 .... 
 
-Error: t**his bootc system is configured to be read-only.** For more information, run `bootc --help`.
+Error: this bootc system is configured to be read-only. For more information, run `bootc --help`.
 ```
 
 <aside>
-💡
-
-BootC는 읽기 전용 시스템(변경사항은 **이미지 빌드 시에만** 가능)이기 때문에, 런타임에 패키지 설치가 불가능하다.
-
+💡 BootC는 읽기 전용 시스템(변경사항은 **이미지 빌드 시에만** 가능)이기 때문에, 런타임에 패키지 설치가 불가능하다.
 </aside>
 
 `rpm-ostree` 를 사용하면 설치가 가능하다.
@@ -204,7 +200,7 @@ Deployments:
                    Digest: sha256:1ee2d77aedea97beb8610d03f5898cc00de064dea800bf66b721edff478c9616
                   Version: 42.20250912.0 (2025-10-03T09:46:41Z)
                      Diff: 2 added
-          LayeredPackages: **htop**
+          LayeredPackages: htop
 
 ● ostree-unverified-registry:quay.io/na3150/immutable-os:latest
                    Digest: sha256:1ee2d77aedea97beb8610d03f5898cc00de064dea800bf66b721edff478c9616
@@ -246,10 +242,7 @@ bash: htop: command not found
 ```
 
 <aside>
-💡
-
-BootC는 읽기 전용 시스템이라 런타임 설치 `dnf install`은 불가능했고, `rpm-ostree install` + 재부팅으로만 패키지 설치/롤백이 가능했다.
-
+💡 BootC는 읽기 전용 시스템이라 런타임 설치 `dnf install`은 불가능했고, `rpm-ostree install` + 재부팅으로만 패키지 설치/롤백이 가능했다.
 </aside>
 
 ## 🌳 빌드해본 BootC Container를 2개의 버전으로 구성해서 OCI Registry Public Repo에 다른 태그(A, B)로 올려보세요. A 태그 컨테이너를 OS로 만들어서 부팅 후, B 태그 컨테이너를 A 컨테이너 기반 OS에서 가져와서 바로 B 컨테이너 기반 OS로 변경해보세요 (BootC Switch)
@@ -289,7 +282,7 @@ status 확인 (staged 상태)
 
 ```bash
 $ sudo bootc status
-  **Staged image: quay.io/na3150/immutable-os:htop**
+  Staged image: quay.io/na3150/immutable-os:htop
         Digest: sha256:fe233335993dafc0f9d476fc363b929097a02020fa3a600d9e00d46ba3d0314b (arm64)
        Version: 42.20250912.0 (2025-10-03T11:46:25Z)
 
@@ -312,7 +305,7 @@ Booted Image가 B버전인 것으로 확인 가능하고, `htop`  명령어 사�
 ```bash
 $ sudo bootc status
 [sudo] password for nayoung: 
-● **Booted image: quay.io/na3150/immutable-os:htop**
+● Booted image: quay.io/na3150/immutable-os:htop
         Digest: sha256:fe233335993dafc0f9d476fc363b929097a02020fa3a600d9e00d46ba3d0314b (arm64)
        Version: 42.20250912.0 (2025-10-03T11:46:25Z)
 
@@ -337,7 +330,7 @@ Next boot: rollback deployment
 ```bash
 $ sudo bootc status
 [sudo] password for nayoung: 
-**● Booted image: quay.io/na3150/immutable-os:latest**
+● Booted image: quay.io/na3150/immutable-os:latest
         Digest: sha256:1ee2d77aedea97beb8610d03f5898cc00de064dea800bf66b721edff478c9616 (arm64)
        Version: 42.20250912.0 (2025-10-03T09:46:41Z)
 

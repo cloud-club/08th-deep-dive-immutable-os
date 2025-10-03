@@ -1,11 +1,5 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]; then
-    echo "사용법: $0 <image:tag>"
-    echo "예시: $0 quay.io/na3150/bootc-demo:tagA"
-    exit 1
-fi
-
 IMAGE=$1
 
 sudo podman --connection podman-machine-default-root run \
