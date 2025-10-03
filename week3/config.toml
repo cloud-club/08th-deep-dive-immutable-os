@@ -1,0 +1,5 @@
+[[customizations.user]]
+name = "nayoung"  
+password = "nayoung"
+groups = ["wheel"] 
+key = "ssh-rsa AAAAB3NzaC1yc...."

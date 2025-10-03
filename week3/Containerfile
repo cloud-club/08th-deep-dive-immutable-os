@@ -1,0 +1,21 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+LABEL containers.bootc=1
+LABEL description="Nayoung's Custom BootC OS"
+
+RUN mkdir -p /var/roothome
+
+# 필수 패키지만 설치
+RUN dnf -y install \
+        cloud-init \
+        openssh-server \
+        vim \
+        nginx && \
+    dnf clean all 
+
+RUN systemctl enable cloud-init && \
+    systemctl enable sshd && \
+    systemctl enable nginx
+
+# 부팅 시 init 시작
+CMD ["/sbin/init"]
