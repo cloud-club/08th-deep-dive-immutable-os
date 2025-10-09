@@ -21,7 +21,7 @@
 
 bootc 기반 OS에 `dnf`로 패키지를 설치했을 때, 나오는 Error.
 
-![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image.png)
+![image.png](images/image.png)
 
 ## 2. nginx를 설치했으나 실행이 안되는 문제
 
@@ -47,9 +47,9 @@ RUN dnf install -y \
     && dnf clean all
 ```
 
-![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image%201.png)
+![image.png](images/image%201.png)
 
-![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image%202.png)
+![image.png](images/image%202.png)
 
 ### 문제 원인
 
