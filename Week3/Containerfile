@@ -9,7 +9,10 @@ LABEL containers.bootc=1
 # root 계정 홈을 /var/roothome으로 변경
 RUN mkdir -p /var/roothome
 
-# nginx 패키지 설치
+# nginx 설치 및 부팅 시 자동 실행 설정
 RUN dnf install -y nginx && \
     systemctl enable nginx && \
-    dnf clean all
+    dnf clean all && \
+    # nginx 실행에 필요한 디렉토리 생성
+    mkdir -p /var/log/nginx /var/lib/nginx/tmp /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx /var/lib/nginx /var/cache/nginx
