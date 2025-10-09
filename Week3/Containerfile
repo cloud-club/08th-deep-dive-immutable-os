@@ -10,6 +10,6 @@ LABEL containers.bootc=1
 RUN mkdir -p /var/roothome
 
 # nginx 패키지 설치
-RUN dnf install -y \
-    nginx \
-    && dnf clean all
+RUN dnf install -y nginx && \
+    systemctl enable nginx && \
+    dnf clean all
