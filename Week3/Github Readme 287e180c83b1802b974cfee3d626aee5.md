@@ -1,0 +1,85 @@
+# Github Readme
+
+## 진행 과정
+
+1. 기존 bootc OS에 nginx 패키지 설치
+2. Containerfile 코드 수정으로 nginx 패키지 설치 → 이미지 빌드 → [quay.io](http://quay.io) push
+3. 이미지 전환 - bootc swtich
+4. 이전 버전 복구 - bootc rollback
+
+## 1. 일반 OS 패키지 설치 VS bootc 기반 OS 패키지 설치
+
+### 일반 OS 패키지 설치
+
+- 일반 OS는 `/`와 `/usr`가 쓰기 가능한 파일시스템.
+- `dnf`는 `/usr/bin`, `/usr/lib` 등 시스템 디렉토리에 바이너리 파일을 복사하고 패키지 데이터베이스(rpm DB)를 `/var/lib/rpm` 등에 기록.
+
+### bootc OS 패키지 설치
+
+- bootc 기반 OS는  `/`와 `/usr` 가 읽기 전용. → `dnf` 가 이 디렉토리에 파일 복사 불가
+- 패키지 추가/변경은 이미지(컨테이너 이미지)에서 처리
+    - Containerfile 수정 → Build → Push → bootc switch
+- 이러한 방식은 OS사용자가 임의로 패키지를 설치 못하게하여 일관성, 재현성이 유지됨
+
+bootc 기반 OS에 `dnf`로 패키지를 설치했을 때, 나오는 Error.
+
+![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image.png)
+
+## 2. nginx를 설치했으나 실행이 안되는 문제
+
+### 문제 상황
+
+아래와 같이 Containerfile을 수정을 하여 nginx가 설치 되었으나 Active되지 않음
+
+```bash
+ARG BASE=quay.io/fedora/fedora-bootc:42
+
+# 베이스 이미지 선택
+FROM ${BASE}
+
+# "부팅 가능한 컨테이너" 라는 표시
+LABEL containers.bootc=1
+
+# root 계정 홈을 /var/roothome으로 변경
+RUN mkdir -p /var/roothome
+
+# nginx 패키지 설치
+RUN dnf install -y \
+    nginx \
+    && dnf clean all
+```
+
+![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image%201.png)
+
+![image.png](Github%20Readme%20287e180c83b1802b974cfee3d626aee5/image%202.png)
+
+### 문제 원인
+
+Containerfile에서 nginx만 설치하고 관련 런타임 디렉토리를 생성하지 않아 발생한 에러
+
+Fedora에서는 nginx가 처음 시작할 때 systemd tmpfiles 규칙(`/usr/lib/tmpfiles.d/nginx.conf`)을 실행하면서 이 디렉토리들을 만들어줌.
+
+- `/var/log/nginx/`
+- `/var/lib/nginx/tmp/`
+- `/var/cache/nginx/`
+
+그러나 bootc 환경은 “부팅 가능한 컨테이너 기반 OS”라서 tmpfiles가 부팅 시 자동 실행되지 않거나, 이미지 빌드 단계에서 한 번도 nginx가 실행되지 않았기 때문에 해당 경로가 없어서 실패.
+
+**tmpfiles이란?**
+
+systemd의 임시 파일 및 디렉토리 생성/정리 메커니즘
+
+→ OS 부팅 시점에 `/var`나 `/run` 등 가변 영역에 필요한 디렉토리, 파일, 권한을 자동으로 만들어주는 시스템 서비스
+
+→ bootc 환경은 이미지 빌드 시점에는 systemd가 동작하지 않기 때문에 규칙 실행 X
+
+### 해결 방법
+
+Containerfile 안에 수동으로 설정
+
+```bash
+mkdir -p /var/log/nginx /var/lib/nginx/tmp /var/cache/nginx && \
+chown -R nginx:nginx /var/log/nginx /var/lib/nginx /var/cache/nginx
+```
+
+- 직접 필요한 디렉토리를 생성
