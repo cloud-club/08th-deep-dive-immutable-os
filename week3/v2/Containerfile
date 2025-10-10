@@ -1,0 +1,15 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+LABEL containers.bootc=12
+
+RUN mkdir -p -m 0700 /var/roothome 
+
+RUN echo "hoyv2" > /etc/hostname
+
+RUN dnf update -y
+
+RUN sudo dnf install vim curl htop atop nginx -y
+
+RUN sudo systemctl enable nginx
+
+RUN bootc container lint

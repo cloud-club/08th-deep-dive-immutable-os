@@ -1,0 +1,9 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+LABEL containers.bootc=12
+
+RUN mkdir -p -m 0700 /var/roothome 
+
+RUN echo "hoyv1" > /etc/hostname
+
+RUN bootc container lint
