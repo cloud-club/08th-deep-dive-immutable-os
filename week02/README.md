@@ -20,7 +20,7 @@ LABEL org.opencontainers.image.revision=${GIT_COMMIT_HASH}
 
 # 패키지 설치
 RUN mkdir -p /var/roothome && \
-		dnf -y install cloud-init httpd openssh-server vim && \
+	dnf -y install cloud-init httpd openssh-server vim && \
     dnf clean all 
     
 # systemd 서비스 활성화
@@ -83,5 +83,6 @@ sudo podman run \
   
 ```
 1. 
+
 
 
