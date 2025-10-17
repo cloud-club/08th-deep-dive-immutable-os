@@ -1,0 +1,31 @@
+FROM quay.io/fedora/fedora-bootc:42
+
+LABEL containers.bootc=12
+
+ARG GIT_HASH=unknown
+
+RUN mkdir -p -m 0700 /var/roothome
+
+# hostname 설정 (여러 방법으로 확실하게)
+RUN echo "${GIT_HASH}" > /etc/hostname && \
+    mkdir -p /etc/systemd/system/systemd-hostnamed.service.d && \
+    echo -e "[Service]\nEnvironment=\"SYSTEMD_HOSTNAME=${GIT_HASH}\"" > /etc/systemd/system/systemd-hostnamed.service.d/override.conf
+
+RUN dnf update -y
+
+RUN sudo dnf install vim curl htop atop nginx jq -y
+
+RUN sudo systemctl enable nginx
+
+# bootc auto-updater 스크립트 추가
+COPY bootc-update.sh /usr/local/bin/bootc-update.sh
+RUN chmod +x /usr/local/bin/bootc-update.sh
+
+# systemd service 파일 추가
+COPY bootc-update.service /etc/systemd/system/bootc-update.service
+COPY bootc-update.timer /etc/systemd/system/bootc-update.timer
+
+# systemd 서비스 활성화
+RUN systemctl enable bootc-update.timer
+
+RUN bootc container lint

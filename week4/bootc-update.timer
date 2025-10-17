@@ -1,0 +1,11 @@
+[Unit]
+Description=Bootc Image Update Timer
+Requires=bootc-update.service
+
+[Timer]
+# 5분마다 체크
+OnBootSec=5min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
