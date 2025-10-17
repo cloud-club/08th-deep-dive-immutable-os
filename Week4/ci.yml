@@ -1,0 +1,31 @@
+name: CI (self-hosted) - Podman build & bootc
+
+on:
+  push:
+    paths:
+      - "Containerfile"
+      - "config.toml"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+env:
+  IMAGE: quay.io/mag0225/jake-fedora-bootc:latest
+
+jobs:
+  build:
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Quay (podman)
+        run: |
+          podman login quay.io \
+            -u "${{ secrets.QUAY_USERNAME }}" \
+            -p "${{ secrets.QUAY_PASSWORD }}"
+
+      - name: Podman build & push
+        run: |
+          podman build -f ./Containerfile -t "$IMAGE" --pull=always .
+          podman push "$IMAGE"
