@@ -1,0 +1,82 @@
+# config.toml template for ISO installer
+
+[[customizations.installer.kickstart]]
+contents = ""
+
+# install-mode
+text
+
+# Language & timezone
+lang en_US-UTF-8
+timezone Asia/Seoul --utc
+
+# Configure-disk-partition
+zerombr # overwrite MBR to 0
+clearpart --all --initlabel --disklabel=gpt
+part /boot --fstype=ext4 --size=512
+part /boot/efi --fstype=efi --size=256
+part pv.01 --size=1 --grow --ondisk=sda
+
+# Configure-LVM
+vglgroup vg_root pv.01
+logvol / --vgname=vg_root --size=1 --grow --name=lv_root --fstype=xfs
+
+# Packages
+%Packages
+# --- environment ---
+@^minimal-environment
+# @^server-environment
+# @^workstation-product-environment
+# @^graphical-server-environment
+# @^virtualization-host-environment
+# @^custom-environment
+# @^kde-desktop-environment
+# @^container-host-environment
+# @^cloud-infrastructure
+
+# --- pkg-Groups ---
+@core
+# @base
+@development-tools
+# @system-tools
+# @security-tools
+# @network-server
+# @performance
+# @container-management
+# @file-server
+# @web-server
+# @graphical-admin-tools
+# @multimedia
+# @fonts
+# @guest-agents
+
+# --- pkgs ---
+vim
+curl
+wget
+sync
+net-tools
+openssh-server
+podman
+lshw
+sysstat
+iperf
+python3*
+
+
+# Connfigure Network
+network
+
+
+
+
+
+name = "test"
+password = "testtest"
+key = "ssh-rsa AAATESTTESTTESTEST"
+groups = ["wheel"]
+
+mountpoint = "/"
+minsize = "10 GiB"
+label = "root"
+fs_type = "xfs"
